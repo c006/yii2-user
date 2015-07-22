@@ -25,6 +25,26 @@ to the require section of your `composer.json` file.
 
 
 
+Composer.json
+------------
+
+>
+    "repositories": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/c006/yii2-user.git"
+        }
+      ]
+  
+  
+  
+  
+  
+  
+  
+  
+
+
 
 
 
