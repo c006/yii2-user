@@ -40,9 +40,16 @@ Composer.json
   
   
   
+Setup
+------------
   
-  
-  
+>
+    'modules'    => [
+        'user'            => [
+            'class'     => 'c006\user\Module',
+            'loginPath' => '/account/dashboard',
+        ],
+    ],
 
 
 
