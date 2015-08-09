@@ -1,22 +1,16 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: user
- * Date: 2/16/2015
- * Time: 10:35 AM
- */
+
 namespace c006\user\controllers;
 
+
+
 use c006\alerts\Alerts;
-use c006\email\EmailTemplates;
-use c006\user\models\form\Login as LoginForm;
-use c006\user\models\form\PasswordResetRequest as PasswordResetRequestForm;
-use c006\user\models\form\Preferences;
-use c006\user\models\form\ResetPassword as ResetPasswordForm;
-use c006\user\models\form\Signup as SignupForm;
+use c006\user\models\form\Login;
+use c006\user\models\form\PasswordResetRequest;
+use c006\user\models\form\ResetPassword;
+use c006\user\models\form\Signup;
 use c006\user\models\User;
 use common\assets\AppHelpers;
-use common\assets\AssetExtrasJs;
 use Yii;
 use yii\base\InvalidParamException;
 use yii\filters\AccessControl;
@@ -105,7 +99,7 @@ class IndexController extends Controller
             return $this->redirect(AppHelpers::formatUrl([Yii::$app->session->get('C006_LOGIN_PATH')]));
         }
 
-        $model = new LoginForm();
+        $model = new Login();
         $post = Yii::$app->request->post();
         if ($model->load($post)) {
             if (!$model->login()) {
@@ -128,11 +122,6 @@ class IndexController extends Controller
 
                 return $this->redirect(AppHelpers::formatUrl(['/account/dashboard']));
             }
-        }
-        /* ~ Assets */
-        $view = $this->getView();
-        if (class_exists('common\\assets\\AssetExtrasJs')) {
-            AssetExtrasJs::register($view);
         }
 
         $cookie = (isset($_COOKIE['LOGIN'])) ? $_COOKIE['LOGIN'] : FALSE;
@@ -169,7 +158,7 @@ class IndexController extends Controller
      */
     public function actionSignup()
     {
-        $model = new SignupForm();
+        $model = new Signup();
         if ($model->load(Yii::$app->request->post())) {
             if ($user = $model->signup()) {
 
@@ -194,10 +183,6 @@ class IndexController extends Controller
                     return $this->redirect(AppHelpers::formatUrl(['user/login']));
                 }
             }
-        }
-        $view = $this->getView();
-        if (class_exists('common\\assets\\AssetExtrasJs')) {
-            AssetExtrasJs::register($view);
         }
 
         return $this->render('signup', [
@@ -246,7 +231,7 @@ class IndexController extends Controller
      */
     public function actionRequestPasswordReset()
     {
-        $model = new PasswordResetRequestForm();
+        $model = new PasswordResetRequest();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             if ($model->sendEmail()) {
                 Yii::$app->getSession()->setFlash('success', 'Check your email for further instructions.');
@@ -275,7 +260,7 @@ class IndexController extends Controller
     public function actionResetPassword($token)
     {
         try {
-            $model = new ResetPasswordForm($token);
+            $model = new ResetPassword($token);
         } catch (InvalidParamException $e) {
             throw new BadRequestHttpException($e->getMessage());
         }
