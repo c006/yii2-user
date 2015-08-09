@@ -1,5 +1,4 @@
 <?php
-use c006\user\models\User;
 use yii\db\Migration;
 use yii\db\Schema;
 
@@ -14,165 +13,96 @@ class m000000_000000_c006_user extends Migration
     */
     public function up()
     {
-        $tableOptions = NULL;
+
+        $this->execute('SET foreign_key_checks = 0');
+        $this->execute('DROP TABLE IF EXISTS `user`');
+        $this->execute('SET foreign_key_checks = 1;');
+
+        $tables = \Yii::$app->db->schema->getTableNames();
         $dbType = $this->db->driverName;
-
-        if ($dbType === 'mysql') {
-            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
-        }
-        $model = new User();
-        if (!array_key_exists('first_name', $model->attributes)) {
-            $this->addColumn(
-                '{{%user}}',
-                'first_name',
-                Schema::TYPE_STRING . '(45) NOT NULL'
-            );
-        }
-        if (!array_key_exists('last_name', $model->attributes)) {
-            $this->addColumn(
-                '{{%user}}',
-                'last_name',
-                Schema::TYPE_STRING . '(45) NOT NULL'
-            );
-        }
-        if (!array_key_exists('login', $model->attributes)) {
-            $this->addColumn(
-                '{{%user}}',
-                'login',
-                Schema::TYPE_STRING . '(100) NOT NULL'
-            );
-        }
-        if (!array_key_exists('login', $model->attributes)) {
-            $this->addColumn(
-                '{{%user}}',
-                'secure_string',
-                Schema::TYPE_STRING . '(100) NOT NULL'
-            );
-        }
+        $tableOptions_mysql = "CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB";
+        $tableOptions_mssql = "";
+        $tableOptions_pgsql = "";
+        $tableOptions_sqlite = "";
 
 
-        if ($dbType == "mysql") {
-            /* MYSQL */
-            $this->createTable('{{%user_billing}}', [
-                'id'              => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
-                0                 => 'PRIMARY KEY (`id`)',
-                'user_id'         => 'INT(10) UNSIGNED NOT NULL',
-                'payment_type_id' => 'SMALLINT(5) UNSIGNED NOT NULL',
-                'first_name'      => 'VARCHAR(60) NOT NULL',
-                'last_name'       => 'VARCHAR(60) NOT NULL',
-                'phone'           => 'VARCHAR(12) NULL',
-                'country_id'      => 'INT(10) UNSIGNED NOT NULL',
-                'postal_code_id'  => 'INT(10) UNSIGNED NOT NULL',
-                'city_id'         => 'INT(10) UNSIGNED NOT NULL',
-                'state_id'        => 'INT(10) UNSIGNED NULL',
-                'region_id'       => 'INT(10) UNSIGNED NULL',
-                'address'         => 'VARCHAR(100) NOT NULL',
-                'address_2'       => 'VARCHAR(100) NULL',
-                'apt_suite'       => 'VARCHAR(20) NULL',
-                'email'           => 'VARCHAR(45) NULL',
-            ], $tableOptions);
-            $this->addForeignKey('fk_user_user_billing', '{{%user_billing}}', 'user_id', '{{%user}}', 'id', 'CASCADE', 'DELETE');
-        }
-        $tableOptions = "";
-        if ($dbType == "mysql") {
-            /* MYSQL */
-            $this->createTable('{{%user_credits}}', [
-                'id'                  => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
-                0                     => 'PRIMARY KEY (`id`)',
-                'user_id'             => 'INT(10) UNSIGNED NOT NULL',
-                'transaction_type_id' => 'SMALLINT(5) UNSIGNED NOT NULL',
-                'transaction_id'      => 'VARCHAR(100) NOT NULL',
-                'credits'             => 'SMALLINT(5) UNSIGNED NOT NULL',
-                'currency'            => 'DECIMAL(12,2) UNSIGNED NOT NULL',
-                'processor'           => 'VARCHAR(30) NULL',
-            ], $tableOptions);
-            $this->addForeignKey('fk_user_user_credits', '{{%user_credits}}', 'user_id', '{{%user}}', 'id', 'CASCADE', 'DELETE');
-        }
-        $tableOptions = "";
-        if ($dbType == "mysql") {
-            /* MYSQL */
-            $this->createTable('{{%user_roles}}', [
-                'id'    => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
-                0       => 'PRIMARY KEY (`id`)',
-                'name'  => 'VARCHAR(100) NOT NULL',
-                'level' => 'SMALLINT(6) NOT NULL',
-            ], $tableOptions);
-        }
-        $tableOptions = "";
-        if ($dbType == "mysql") {
-            /* MYSQL */
-            $this->createTable('{{%user_roles_link}}', [
-                'id'            => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
-                0               => 'PRIMARY KEY (`id`)',
-                'user_id'       => 'INT(10) UNSIGNED NOT NULL',
-                'user_roles_id' => 'INT(10) UNSIGNED NOT NULL',
-            ], $tableOptions);
-            $this->addForeignKey('fk_user_user_roles_link', '{{%user_roles_link}}', 'user_id', '{{%user}}', 'id', 'CASCADE', 'DELETE');
-        }
-        $tableOptions = "";
-        if ($dbType == "mysql") {
-            /* MYSQL */
-            $this->createTable('{{%user_shipping}}', [
-                'id'             => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
-                0                => 'PRIMARY KEY (`id`)',
-                'user_id'        => 'INT(10) UNSIGNED NOT NULL',
-                'first_name'     => 'VARCHAR(60) NOT NULL',
-                'last_name'      => 'VARCHAR(60) NOT NULL',
-                'phone'          => 'VARCHAR(12) NULL',
-                'country_id'     => 'INT(10) UNSIGNED NOT NULL',
-                'postal_code_id' => 'INT(10) UNSIGNED NOT NULL',
-                'city_id'        => 'INT(10) UNSIGNED NOT NULL',
-                'state_id'       => 'INT(10) UNSIGNED NULL',
-                'region_id'      => 'INT(10) UNSIGNED NULL',
-                'address'        => 'VARCHAR(100) NOT NULL',
-                'address_2'      => 'VARCHAR(100) NULL',
-                'apt_suite'      => 'VARCHAR(20) NULL',
-                'default'        => 'TINYINT(1) NULL',
-            ], $tableOptions);
-            $this->addForeignKey('fk_user_user_shipping', '{{%user_shipping}}', 'user_id', '{{%user}}', 'id', 'CASCADE', 'DELETE');
-        }
-        $tableOptions = "";
-        if ($dbType == "mysql") {
-            /* MYSQL */
-            $this->createTable('{{%user_transaction_details}}', [
-                'id'              => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
-                0                 => 'PRIMARY KEY (`id`)',
-                'user_credits_id' => 'INT(10) UNSIGNED NOT NULL',
-                'user_id'         => 'INT(10) UNSIGNED NOT NULL',
-                'key'             => 'VARCHAR(100) NOT NULL',
-                'value'           => 'VARCHAR(100) NOT NULL',
-            ], $tableOptions);
-        }
-        $tableOptions = "";
-        if ($dbType == "mysql") {
-            /* MYSQL */
-            $this->createTable('{{%user_types}}', [
-                'id'   => 'SMALLINT(5) UNSIGNED NOT NULL AUTO_INCREMENT',
-                0      => 'PRIMARY KEY (`id`)',
-                'name' => 'VARCHAR(45) NOT NULL',
-            ], $tableOptions);
-        }
-        $tableOptions = "";
-        if ($dbType == "mysql") {
-            /* MYSQL */
-            $this->createTable('{{%user_types_link}}', [
-                'id'            => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
-                0               => 'PRIMARY KEY (`id`)',
-                'user_id'       => 'INT(10) UNSIGNED NOT NULL',
-                'user_types_id' => 'SMALLINT(5) UNSIGNED NOT NULL',
-            ], $tableOptions);
-            $this->addForeignKey('fk_user_user_types_link', '{{%user_types_link}}', 'user_id', '{{%user}}', 'id', 'CASCADE', 'DELETE');
+        /* MYSQL */
+        if (!in_array('user', $tables)) {
+            if ($dbType == "mysql") {
+                $this->createTable('{{%user}}', [
+                    'id'                   => 'INT(11) UNSIGNED NOT NULL AUTO_INCREMENT',
+                    0                      => 'PRIMARY KEY (`id`)',
+                    'username'             => 'VARCHAR(255) NOT NULL',
+                    'auth_key'             => 'VARCHAR(32) NOT NULL',
+                    'password_hash'        => 'VARCHAR(255) NOT NULL',
+                    'password_reset_token' => 'VARCHAR(255) NULL',
+                    'email'                => 'VARCHAR(255) NOT NULL',
+                    'role'                 => 'SMALLINT(6) NOT NULL DEFAULT \'10\'',
+                    'status'               => 'SMALLINT(6) NOT NULL DEFAULT \'10\'',
+                    'created_at'           => 'TIMESTAMP NULL',
+                    'updated_at'           => 'TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ',
+                    'phone'                => 'VARCHAR(14) NULL',
+                    'first_name'           => 'VARCHAR(45) NOT NULL',
+                    'last_name'            => 'VARCHAR(45) NOT NULL',
+                    'login'                => 'VARCHAR(45) NULL',
+                    'single_use'           => 'VARCHAR(100) NULL',
+                ], $tableOptions_mysql);
+            }
         }
 
+        /* MYSQL */
+        if (!in_array('user_roles', $tables)) {
+            if ($dbType == "mysql") {
+                $this->createTable('{{%user_roles}}', [
+                    'id'    => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
+                    0       => 'PRIMARY KEY (`id`)',
+                    'name'  => 'VARCHAR(100) NOT NULL',
+                    'level' => 'SMALLINT(6) NOT NULL',
+                ], $tableOptions_mysql);
+            }
+        }
+
+        /* MYSQL */
+        if (!in_array('user_roles_link', $tables)) {
+            if ($dbType == "mysql") {
+                $this->createTable('{{%user_roles_link}}', [
+                    'id'            => 'INT(10) UNSIGNED NOT NULL AUTO_INCREMENT',
+                    0               => 'PRIMARY KEY (`id`)',
+                    'user_id'       => 'INT(10) UNSIGNED NOT NULL',
+                    'user_roles_id' => 'INT(10) UNSIGNED NOT NULL',
+                ], $tableOptions_mysql);
+            }
+        }
+
+        $this->createIndex('idx_UNIQUE_email_8016_00', 'user', 'email', 1);
+        $this->createIndex('idx_UNIQUE_name_8037_01', 'user_roles', 'name', 1);
+        $this->createIndex('idx_user_id_8056_02', 'user_roles_link', 'user_id', 0);
+
+        $this->execute('SET foreign_key_checks = 0');
+        $this->addForeignKey('fk_user_8052_00', '{{%user_roles_link}}', 'user_id', '{{%user}}', 'id', 'CASCADE', 'NO ACTION');
+        $this->execute('SET foreign_key_checks = 1;');
+
+        $this->execute('SET foreign_key_checks = 0');
+        $this->insert('{{%user}}', ['id' => '1', 'username' => 'clhosting@hotmail.com', 'auth_key' => 'CcqfH1ZuHo-HxdM-DK3yX4d0Z9SyNWUq', 'password_hash' => '$2y$13$E2Cedx.IWufS03d6IgGe..TwDYZxTz1WpNi7/65ZqghlLr5nHXgvS', 'password_reset_token' => '', 'email' => 'clhosting@hotmail.com', 'role' => '10', 'status' => '10', 'created_at' => '0000-00-00 00:00:00', 'updated_at' => '0000-00-00 00:00:00', 'phone' => '9492026160', 'first_name' => 'user', 'last_name' => 'admin', 'login' => '', 'single_use' => 'WGtOX2F0M1YWXwJnKBpjGD9YK2slK2sFGSA.KgYbWzJrLRklLRZ4bg==']);
+        $this->insert('{{%user_roles}}', ['id' => '1', 'name' => 'Admin', 'level' => '100']);
+        $this->insert('{{%user_roles}}', ['id' => '2', 'name' => 'User', 'level' => '10']);
+        $this->insert('{{%user_roles_link}}', ['id' => '1', 'user_id' => '1', 'user_roles_id' => '1']);
+        $this->execute('SET foreign_key_checks = 1;');
 
     }
 
     public function down()
     {
-        $this->dropColumn('{{%user}}', 'first_name');
-        $this->dropColumn('{{%user}}', 'last_name');
-        $this->dropTable('%user_roles');
-        $this->dropTable('%user_roles_link');
+        $this->execute('SET foreign_key_checks = 0');
+        $this->execute('DROP TABLE IF EXISTS `user`');
+        $this->execute('SET foreign_key_checks = 1;');
+        $this->execute('SET foreign_key_checks = 0');
+        $this->execute('DROP TABLE IF EXISTS `user_roles`');
+        $this->execute('SET foreign_key_checks = 1;');
+        $this->execute('SET foreign_key_checks = 0');
+        $this->execute('DROP TABLE IF EXISTS `user_roles_link`');
+        $this->execute('SET foreign_key_checks = 1;');
+
     }
 }
 
