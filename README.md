@@ -3,26 +3,11 @@ Yii2 user
 
 
 
-
 Installation
 ------------
 
-The preferred way to install this extension is through [composer](http://getcomposer.org/download/).
 
-Either run
-
-`
-php composer.phar require --prefer-dist "c006/yii2-user" "dev-master"
-`
-
-or add
-
-`
-"c006/yii2-user": "dev-master"
-`
-
-to the require section of your `composer.json` file.
-
+User `composer.json`
 
 
 Composer.json
@@ -33,7 +18,11 @@ Composer.json
         {
           "type": "vcs",
           "url": "https://github.com/c006/yii2-user.git"
-        }
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/c006/yii2-email-templates.git"
+        },
       ]
   
   
@@ -52,7 +41,47 @@ Setup
     ],
 
 
+**config/params.php**
+>
+            'siteName'          => 'My Site',
+            'siteUrl'           => 'http://my-site.com',
+            'user_verfiy_email' => TRUE,
+            'user_login_path'   => '/account',
+            
+            
+Requires
+-----------
 
+
+` php composer.phar require --prefer-dist "c006/yii2-alerts" "dev-master" `
+
+
+
+
+
+
+Comments
+---------
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+ 
+  
+  
+  
+    
+    
 
 
 

@@ -18,8 +18,6 @@ class Module extends \yii\base\Module
     public $controllerNamespace = 'c006\user\controllers';
 
 
-    public $loginPath = '/';
-
     /**
      *
      */
@@ -27,7 +25,6 @@ class Module extends \yii\base\Module
     {
         parent::init();
 
-        Yii::$app->session->set('C006_LOGIN_PATH', $this->loginPath);
     }
 
 
@@ -42,7 +39,7 @@ class Module extends \yii\base\Module
         preg_match('/(default)/', $route, $match);
         if (isset($match[0]))
             return parent::createController($route);
-        $this->defaultRoute = (!$this->defaultRoute || $this->defaultRoute == 'default') ? 'index' : $this->defaultRoute;
+        $this->defaultRoute = (!$this->defaultRoute || $this->defaultRoute == 'default') ? 'user' : $this->defaultRoute;
         if (sizeof(explode('/', $route)) > 1) {
             list($this->defaultRoute, $route) = explode('/', $route);
         }

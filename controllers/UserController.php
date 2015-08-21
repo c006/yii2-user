@@ -19,11 +19,11 @@ use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 
 /**
- * Class IndexController
+ * Class UserController
  *
  * @package c006\user\controllers
  */
-class IndexController extends Controller
+class UserController extends Controller
 {
 
 
@@ -70,18 +70,12 @@ class IndexController extends Controller
         ];
     }
 
-
+    /**
+     *
+     */
     function init()
     {
 
-//        $remote_ip = $_SERVER['REMOTE_ADDR'];
-//        $arp = `arp -a $remote_ip`;
-//        print_r($arp);
-//        exit;
-//
-//        print_r($_SERVER);
-//
-//        exit;
     }
 
     /**
@@ -90,12 +84,10 @@ class IndexController extends Controller
     public function actionIndex()
     {
         if (\Yii::$app->user->isGuest) {
-            $this->redirect(AppHelpers::formatUrl(['user/login']));
-
-            return;
+            return $this->redirect(['user/login']);
         }
-        $this->redirect(AppHelpers::formatUrl(['/account']));
 
+        return self::userRedirect();
     }
 
     /**
@@ -104,7 +96,8 @@ class IndexController extends Controller
     public function actionLogin()
     {
         if (!\Yii::$app->user->isGuest) {
-            return $this->redirect(AppHelpers::formatUrl([Yii::$app->session->get('C006_LOGIN_PATH')]));
+
+            return self::userRedirect();
         }
 
         $model = new Login();
@@ -117,13 +110,8 @@ class IndexController extends Controller
                 $content = $this->renderPartial('user-login-message');
                 Alerts::setMessage($content);
                 Alerts::setAlertType(Alerts::ALERT_SUCCESS);
-                if (Yii::$app->session->get('C006_LOGIN_PATH')) {
-                    $path = Yii::$app->session->get('C006_LOGIN_PATH');
 
-                    return $this->redirect(AppHelpers::formatUrl([$path]));
-                }
-
-                return $this->redirect('/');
+                return self::userRedirect();
             }
         }
 
@@ -175,8 +163,6 @@ class IndexController extends Controller
         Alerts::setMessage('Your token did not match our records, please contact support');
         Alerts::setAlertType(Alerts::ALERT_WARNING);
 
-        die("NO");
-
         return $this->redirect('/');
     }
 
@@ -200,31 +186,27 @@ class IndexController extends Controller
 
             if ($user = $model->signup()) {
 
-//                print_r($user); exit;
-
                 Alerts::setMessage('Thank you ' . $user->first_name . ', for signing up.<br>Please check your email to complete the process.');
                 Alerts::setAlertType(Alerts::ALERT_SUCCESS);
-                //if (Yii::$app->getUser()->login($user)) {
+                if (Yii::$app->getUser()->login($user)) {
 
-                /* ~ c006\email\EmailTemplates */
-                $array = [];
-                $array['page_title'] = ' :: Sign Up';
-                $array['name'] = $user->first_name;
-                $array['subject'] = Yii::$app->params['siteName'] . $array['page_title'];
-                $array['message'] = \c006\email\assets\Assets::$MSG_SIGN_UP_VERIFY;
-                $array['message'] = str_replace('#NAME#', $array['name'], $array['message']);
-                $array['message'] = str_replace('#VERIFY_URL#', Yii::$app->params['siteUrl'] . '/user/email?token=' . substr($user->security, 0, 11) . '.' . md5($user->pin), $array['message']);
-                $array['email_to'] = $user->email;
-                $array['email_from'] = Yii::$app->params['supportEmail'];
-                $array['email_from_name'] = Yii::$app->params['siteName'];
+                    /* ~ c006\email\EmailTemplates */
+                    $array = [];
+                    $array['company_name'] = Yii::$app->params['siteName'];
+                    $array['page_title'] = ' :: Sign Up';
+                    $array['name'] = $user->first_name;
+                    $array['subject'] = $array['company_name'] . $array['page_title'];
+                    $array['message'] = \c006\email\assets\Assets::$MSG_SIGN_UP_VERIFY;
+                    $array['message'] = str_replace('#NAME#', $array['name'], $array['message']);
+                    $array['message'] = str_replace('#VERIFY_URL#', Yii::$app->params['siteUrl'] . '/user/email?token=' . substr($user->security, 0, 11) . '.' . md5($user->pin), $array['message']);
+                    $array['email_to'] = $user->email;
+                    $array['email_from'] = Yii::$app->params['supportEmail'];
+                    $array['email_from_name'] = Yii::$app->params['siteName'];
 
-                EmailTemplates::widget(['template' => 'sign-up', 'array' => $array]);
+                    EmailTemplates::widget(['template' => 'sign-up', 'array' => $array]);
 
-                /* End */
-                die("done");
-
-                return $this->redirect(AppHelpers::formatUrl(['user/login']));
-                //}
+                    return $this->redirect(['user/login']);
+                }
             }
         }
 
@@ -240,9 +222,7 @@ class IndexController extends Controller
     public function actionPreferences()
     {
         if (\Yii::$app->user->isGuest) {
-            $this->redirect(AppHelpers::formatUrl(['/user/login']));
-
-            return;
+            return $this->redirect(['/user/login']);
         }
         $model = User::find()
             ->where(['id' => Yii::$app->user->id])
@@ -260,7 +240,7 @@ class IndexController extends Controller
             Alerts::setMessage('Preferences updated');
             Alerts::setAlertType(Alerts::ALERT_SUCCESS);
 
-            return $this->redirect(AppHelpers::formatUrl(['user/']));
+            return $this->redirect(['user/']);
         }
 
         return $this->render('preferences', [
@@ -314,11 +294,30 @@ class IndexController extends Controller
         }
 
         return $this->render('resetPassword', [
-            'model' => $model,
+            'model'             => $model,
+
         ]);
     }
 
+    /**
+     * @return array
+     */
+    private function userRedirect()
+    {
+        if (Yii::$app->params['user_login_path']) {
+            $path = Yii::$app->params['user_login_path'];
 
+            return [$path];
+        }
+
+        return ['/'];
+    }
+
+    /**
+     * @param $id
+     *
+     * @return null|static
+     */
     private function loadModel($id)
     {
         return User::findOne($id);
