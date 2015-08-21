@@ -2,6 +2,7 @@
 
 namespace c006\user\controllers;
 
+use c006\core\assets\CoreHelper;
 use c006\user\models\search\UserRoles as UserRolesSearch;
 use c006\user\models\User;
 use c006\user\models\UserRoles;
@@ -17,7 +18,7 @@ class UserRolesController extends Controller
 {
 
     const ADMIN_ROLE_LEVEL = 100;
-    const ROLES_ON         = TRUE;
+    const ROLES_ON = TRUE;
 
     public function behaviors()
     {
@@ -35,10 +36,8 @@ class UserRolesController extends Controller
     {
         /* ~ Modify to match user role levels */
         /* ~ Default is admin == 100 */
-        if (self::ROLES_ON && User::userRoleLevel() < self::ADMIN_ROLE_LEVEL) {
-            $this->redirect(AppHelpers::formatUrl(['user/login']));
-
-            return;
+        if ((CoreHelper::checkLogin() && CoreHelper::isGuest()) && self::ROLES_ON && User::userRoleLevel() < self::ADMIN_ROLE_LEVEL) {
+            return $this->redirect(CoreHelper::formatUrl(['user/login']));
         }
     }
 
@@ -49,7 +48,7 @@ class UserRolesController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel  = new UserRolesSearch();
+        $searchModel = new UserRolesSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [

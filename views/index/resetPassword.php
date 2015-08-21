@@ -6,7 +6,7 @@ use yii\helpers\Html;
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $model c006\user\models\form\ResetPassword */
 
-$this->title                   = 'Reset password';
+$this->title = 'Reset password';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-reset-password">

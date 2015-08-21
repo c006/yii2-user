@@ -3,6 +3,7 @@
 namespace c006\user\controllers;
 
 use c006\user\models\search\UserRolesLink as UserRolesLinkSearch;
+use c006\user\models\User;
 use c006\user\models\UserRolesLink;
 use Yii;
 use yii\filters\VerbFilter;
@@ -14,6 +15,16 @@ use yii\web\NotFoundHttpException;
  */
 class UserRolesLinkController extends Controller
 {
+
+    public function init()
+    {
+        /* ~ Modify to match user role levels */
+        /* ~ Default is admin == 100 */
+        if ((CoreHelper::checkLogin() && CoreHelper::isGuest()) && UserRolesController::ROLES_ON && User::userRoleLevel() < UserRolesController::ADMIN_ROLE_LEVEL) {
+            return $this->redirect(CoreHelper::formatUrl(['user/login']));
+        }
+    }
+
     public function behaviors()
     {
         return [
@@ -33,7 +44,7 @@ class UserRolesLinkController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel  = new UserRolesLinkSearch();
+        $searchModel = new UserRolesLinkSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [

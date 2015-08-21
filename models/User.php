@@ -10,29 +10,29 @@ use yii\web\IdentityInterface;
 /**
  * User model
  *
- * @property integer  $id
- * @property string   $username
- * @property string   $password_hash
- * @property string   $password_reset_token
- * @property string   $email
- * @property string   $auth_key
- * @property integer  $role
- * @property integer  $status
- * @property integer  $created_at
- * @property integer  $updated_at
- * @property string   $password write-only password
+ * @property integer $id
+ * @property string $username
+ * @property string $password_hash
+ * @property string $password_reset_token
+ * @property string $email
+ * @property string $auth_key
+ * @property integer $role
+ * @property integer $status
+ * @property integer $created_at
+ * @property integer $updated_at
+ * @property string $password write-only password
  *
- * @property string   $first_name
- * @property string   $last_name
- * @property string   $phone
- * @property string   $login
- * @property string   $single_use
+ * @property string $first_name
+ * @property string $last_name
+ * @property string $phone
+ * @property string $pin
+ * @property string $security
  */
 class User extends ActiveRecord implements IdentityInterface
 {
     const STATUS_DELETED = 0;
-    const STATUS_ACTIVE  = 10;
-    const ROLE_USER      = 10;
+    const STATUS_ACTIVE = 10;
+    const ROLE_USER = 10;
 
     /**
      * @inheritdoc
@@ -143,9 +143,9 @@ class User extends ActiveRecord implements IdentityInterface
         }
 
         return static::findOne([
-                                   'password_reset_token' => $token,
-                                   'status'               => self::STATUS_ACTIVE,
-                               ]);
+            'password_reset_token' => $token,
+            'status'               => self::STATUS_ACTIVE,
+        ]);
     }
 
     /**
@@ -160,8 +160,8 @@ class User extends ActiveRecord implements IdentityInterface
         if (empty($token)) {
             return FALSE;
         }
-        $expire    = Yii::$app->params['user.passwordResetTokenExpire'];
-        $parts     = explode('_', $token);
+        $expire = Yii::$app->params['user.passwordResetTokenExpire'];
+        $parts = explode('_', $token);
         $timestamp = (int)end($parts);
 
         return $timestamp + $expire >= time();
@@ -173,15 +173,14 @@ class User extends ActiveRecord implements IdentityInterface
     static public function userRoleLevel()
     {
         $model = UserRolesLink::find()
-                              ->where(['user_id' => Yii::$app->user->id])
-                              ->andWhere(['>=', 'user_roles_id', 100])
-                              ->asArray()
-                              ->one();
+            ->where(['user_id' => Yii::$app->user->id])
+            ->andWhere(['>=', 'user_roles_id', 100])
+            ->asArray()
+            ->one();
         if (is_array($model) && $model['user_roles_id'])
             return $model['user_roles_id'];
 
         return 0;
-
     }
 
     /**

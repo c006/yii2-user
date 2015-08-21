@@ -2,10 +2,10 @@
 
 namespace c006\user\models\search;
 
+use c006\user\models\UserRolesLink as UserRolesLinkModel;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use c006\user\models\UserRolesLink as UserRolesLinkModel;
 
 /**
  * UserRolesLink represents the model behind the search form about `c006\user\models\UserRolesLink`.
@@ -52,8 +52,8 @@ class UserRolesLink extends UserRolesLinkModel
 
         $query->andFilterWhere([
             'user_roles_link_id' => $this->user_roles_link_id,
-            'user_id' => $this->user_id,
-            'user_roles_id' => $this->user_roles_id,
+            'user_id'            => $this->user_id,
+            'user_roles_id'      => $this->user_roles_id,
         ]);
 
         return $dataProvider;

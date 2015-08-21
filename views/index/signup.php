@@ -6,10 +6,8 @@ use yii\helpers\Html;
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $model c006\user\models\form\Signup */
 
-
 $this->title = 'Signup';
 $this->params['breadcrumbs'][] = $this->title;
-
 
 ?>
 <div class="site-signup">

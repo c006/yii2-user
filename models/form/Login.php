@@ -1,6 +1,7 @@
 <?php
 namespace c006\user\models\form;
 
+use c006\alerts\Alerts;
 use c006\user\models\User;
 use Yii;
 use yii\base\Model;
@@ -11,13 +12,13 @@ use yii\base\Model;
 class Login extends Model
 {
 
-    public  $email;
+    public $email;
 
-    public  $password;
+    public $password;
 
-    public  $rememberMe = 0;
+    public $rememberMe = 0;
 
-    private $_user      = FALSE;
+    private $_user = FALSE;
 
 
     /**
@@ -36,7 +37,7 @@ class Login extends Model
      * This method serves as the inline validation for password.
      *
      * @param string $attribute the attribute currently being validated
-     * @param array  $params    the additional name-value pairs given in the rule
+     * @param array $params     the additional name-value pairs given in the rule
      */
     public function validatePassword($attribute, $params)
     {
@@ -57,6 +58,11 @@ class Login extends Model
     {
         if ($this->_user === FALSE) {
             $this->_user = User::findByemail($this->email);
+            if (isset($this->_user->status) && !$this->_user->status) {
+                Alerts::setMessage('Please use your email token to open account');
+                Alerts::setAlertType(Alerts::ALERT_WARNING);
+                $this->_user = FALSE;
+            }
         }
 
         return $this->_user;
@@ -70,7 +76,8 @@ class Login extends Model
     public function login()
     {
         if ($this->validate()) {
-            return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0);
+
+            return Yii::$app->user->login($this->getUser(), 0);
         } else {
             return FALSE;
         }

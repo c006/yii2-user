@@ -8,7 +8,7 @@ use Yii;
  * This is the model class for table "user_roles".
  *
  * @property integer $user_roles_id
- * @property string  $name
+ * @property string $name
  * @property integer $level
  */
 class UserRoles extends \yii\db\ActiveRecord

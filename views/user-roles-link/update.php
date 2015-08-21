@@ -6,8 +6,8 @@ use yii\helpers\Html;
 /* @var $model c006\user\models\UserRolesLink */
 
 $this->title = Yii::t('app', 'Update {modelClass}: ', [
-    'modelClass' => 'User Roles Link',
-]) . ' ' . $model->user_roles_link_id;
+        'modelClass' => 'User Roles Link',
+    ]) . ' ' . $model->user_roles_link_id;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'User Roles Links'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->user_roles_link_id, 'url' => ['view', 'id' => $model->user_roles_link_id]];
 $this->params['breadcrumbs'][] = Yii::t('app', 'Update');

@@ -1,6 +1,5 @@
 <?php
 use c006\activeForm\ActiveForm;
-use common\assets\AppHelpers;
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
@@ -17,16 +16,15 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
     <div class="">
-        <?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
+        <?php $form = ActiveForm::begin(['id' => 'form-login']); ?>
         <?= $form->field($model, 'email') ?>
         <?= $form->field($model, 'password')->passwordInput() ?>
-        <?= $form->field($model, 'rememberMe')->toggle() ?>
 
         <div class="form-group">
             <?= Html::SubmitButton('Login', ['class' => 'btn btn-primary', 'name' => 'button-submit']) ?>
 
-            <?= Html::button('Register', ['class' => 'btn btn-success float-right', 'id' => 'button-register']) ?>
-            <?= Html::button('Reset Password', ['class' => 'btn btn-success float-right', 'id' => 'button-reset', 'style' => 'margin-right: 10px;']) ?>
+            <?= Html::a(Yii::t('app', 'Register'), ['/user/signup'], ['class' => 'btn btn-success inline-block float-right']) ?>
+            <?= Html::a(Yii::t('app', 'Reset Password'), ['/user/request-password-reset'], ['class' => 'btn btn-success float-right inline-block margin-right-10']) ?>
         </div>
         <?php ActiveForm::end(); ?>
     </div>
@@ -36,28 +34,4 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php if (class_exists('c006\\spinner\\SubmitSpinner')) : ?>
     <?= c006\spinner\SubmitSpinner::widget(['form_id' => $form->id]); ?>
 <?php endif ?>
-
-<script type="text/javascript">
-    jQuery(function () {
-        jQuery('#button-register')
-            .click(
-            function () {
-                document.location.href = '<?= AppHelpers::formatUrl(['/user/signup']) ?>';
-            });
-        jQuery('#button-reset')
-            .click(
-            function () {
-                document.location.href = '<?= AppHelpers::formatUrl(['/user/request-password-reset','e'=>'']) ?>' + jQuery('#login-email').val();
-            });
-        <?php if (class_exists('common\\assets\\AssetExtrasJs')) : ?>
-        var $extras = new Extras();
-        $extras.init();
-        <?php endif ?>
-        <?php if ($model->rememberMe) : ?>
-        setTimeout(function () {
-            jQuery('span.c006-activeform-toggle-on').trigger('click');
-        }, 600);
-        <?php endif ?>
-     });
-</script>
 

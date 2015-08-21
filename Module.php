@@ -1,6 +1,7 @@
 <?php
 
 namespace c006\user;
+
 use Yii;
 
 /**
@@ -18,13 +19,13 @@ class Module extends \yii\base\Module
 
 
     public $loginPath = '/';
+
     /**
      *
      */
     public function init()
     {
         parent::init();
-
 
         Yii::$app->session->set('C006_LOGIN_PATH', $this->loginPath);
     }

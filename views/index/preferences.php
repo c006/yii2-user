@@ -9,11 +9,9 @@ use c006\activeForm\ActiveForm;
 use common\assets\AppHelpers;
 use yii\helpers\Html;
 
-
 /** @var $model c006\user\models\User */
 
-
-$this->title                   = Yii::t('app', 'User Preferences');
+$this->title = Yii::t('app', 'User Preferences');
 $this->params['breadcrumbs'][] = ['label' => 'Account', 'url' => AppHelpers::formatUrl(['account/index'])];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -44,7 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
     jQuery(function () {
         jQuery('#button-reset')
             .click(function () {
-                       jQuery('#form-reset').submit();
-                   });
+                jQuery('#form-reset').submit();
+            });
     });
 </script>

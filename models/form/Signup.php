@@ -1,6 +1,7 @@
 <?php
 namespace c006\user\models\form;
 
+use c006\core\assets\CoreHelper;
 use c006\user\models\User;
 use Yii;
 use yii\base\Model;
@@ -13,21 +14,23 @@ use yii\base\Model;
 class Signup extends Model
 {
 
-    public  $username;
+    public $username;
 
-    public  $email;
+    public $email;
 
-    public  $password;
+    public $password;
 
-    public  $password_match;
+    public $password_match;
 
-    public  $phone;
+    public $phone;
 
-    public  $first_name;
+    public $first_name;
 
-    public  $last_name;
+    public $last_name;
 
-    private $login;
+    private $pin;
+
+    private $security;
 
     /**
      * @inheritdoc
@@ -59,16 +62,20 @@ class Signup extends Model
     public function signup()
     {
         if ($this->validate()) {
-            $user           = new User();
-            $user->email    = $this->email;
+            $user = new User();
+            $user->email = $this->email;
             $user->username = $this->email;
             $user->setPassword($this->password);
             $user->generateAuthKey();
-            $user->phone      = $this->phone;
+            $user->phone = $this->phone;
             $user->first_name = $this->first_name;
-            $user->last_name  = $this->last_name;
-            $user->created_at = time();
-            $user->login      = base64_encode($this->password) . base64_encode($user->email);
+            $user->last_name = $this->last_name;
+            $user->status = 0;
+            $user->created_at = CoreHelper::mysqlTimestamp();
+            $user->updated_at = CoreHelper::mysqlTimestamp();
+            $user->pin = md5(CoreHelper::random_number(4));
+            $user->security = CoreHelper::createToken(100);
+
             $user->save();
 
             return $user;

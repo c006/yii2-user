@@ -19,7 +19,7 @@
       "c006\\user\\": ""
     }
   },
-  "require-dev": {
+  "require": {
     "c006/yii2-email-templates": "dev-master",
     "c006/yii2-alerts": "dev-master"
   },

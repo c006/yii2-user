@@ -6,8 +6,8 @@ use yii\helpers\Html;
 /* @var $model c006\user\models\UserRoles */
 
 $this->title = Yii::t('app', 'Update {modelClass}: ', [
-    'modelClass' => 'User Roles',
-]) . ' ' . $model->name;
+        'modelClass' => 'User Roles',
+    ]) . ' ' . $model->name;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'User Roles'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->user_roles_id]];
 $this->params['breadcrumbs'][] = Yii::t('app', 'Update');

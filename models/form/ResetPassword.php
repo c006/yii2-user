@@ -23,7 +23,7 @@ class ResetPassword extends Model
      * Creates a form model given a token.
      *
      * @param  string $token
-     * @param  array  $config name-value pairs that will be used to initialize the object properties
+     * @param  array $config name-value pairs that will be used to initialize the object properties
      *
      * @throws \yii\base\InvalidParamException if token is empty or not valid
      */
@@ -57,7 +57,7 @@ class ResetPassword extends Model
      */
     public function resetPassword()
     {
-        $user           = $this->_user;
+        $user = $this->_user;
         $user->password = $this->password;
         $user->removePasswordResetToken();
 

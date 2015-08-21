@@ -2,9 +2,9 @@
 
 namespace c006\user\controllers;
 
-
-
 use c006\alerts\Alerts;
+use c006\core\assets\CoreHelper;
+use c006\email\EmailTemplates;
 use c006\user\models\form\Login;
 use c006\user\models\form\PasswordResetRequest;
 use c006\user\models\form\ResetPassword;
@@ -33,12 +33,8 @@ class IndexController extends Controller
     public function actions()
     {
         return [
-            'error'   => [
+            'error' => [
                 'class' => 'yii\web\ErrorAction',
-            ],
-            'captcha' => [
-                'class'           => 'yii\captcha\CaptchaAction',
-                'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : NULL,
             ],
         ];
     }
@@ -75,6 +71,19 @@ class IndexController extends Controller
     }
 
 
+    function init()
+    {
+
+//        $remote_ip = $_SERVER['REMOTE_ADDR'];
+//        $arp = `arp -a $remote_ip`;
+//        print_r($arp);
+//        exit;
+//
+//        print_r($_SERVER);
+//
+//        exit;
+    }
+
     /**
      *
      */
@@ -94,7 +103,6 @@ class IndexController extends Controller
      */
     public function actionLogin()
     {
-
         if (!\Yii::$app->user->isGuest) {
             return $this->redirect(AppHelpers::formatUrl([Yii::$app->session->get('C006_LOGIN_PATH')]));
         }
@@ -106,11 +114,6 @@ class IndexController extends Controller
                 Alerts::setMessage('Login failed, please try again');
                 Alerts::setAlertType(Alerts::ALERT_DANGER);
             } else {
-
-                if (isset($post['Login']['rememberMe'])) {
-                    setcookie('LOGIN', md5(Yii::$app->user->id), time() + (86400 * 30)); /* 30 days */
-                }
-
                 $content = $this->renderPartial('user-login-message');
                 Alerts::setMessage($content);
                 Alerts::setAlertType(Alerts::ALERT_SUCCESS);
@@ -120,20 +123,7 @@ class IndexController extends Controller
                     return $this->redirect(AppHelpers::formatUrl([$path]));
                 }
 
-                return $this->redirect(AppHelpers::formatUrl(['/account/dashboard']));
-            }
-        }
-
-        $cookie = (isset($_COOKIE['LOGIN'])) ? $_COOKIE['LOGIN'] : FALSE;
-        if ($cookie) {
-            /** @var  $m \c006\user\models\User */
-            $m = User::find()
-                ->where(" MD5(id) = '" . $cookie . "' ")
-                ->one();
-            if (is_object($m)) {
-                $model->email = $m->email;
-                $model->password = base64_decode(str_replace(base64_encode($m->email), '', $m->login));
-                $model->rememberMe = 1;
+                return $this->redirect('/');
             }
         }
 
@@ -141,6 +131,53 @@ class IndexController extends Controller
             'model' => $model,
         ]);
 
+    }
+
+    /**
+     * @param $token
+     *
+     * @return \yii\web\Response
+     */
+    public function actionEmail($token)
+    {
+
+        if (stripos($token, '.') != FALSE) {
+
+            list($security, $pin) = explode('.', $token);
+            $model = User::find()
+                ->where(" SUBSTRING(`security`, 1 ,11) = '" . $security . "' AND MD5(MD5(pin)) = '" . md5($pin) . "'")
+                ->asArray()
+                ->one();
+            if (sizeof($model)) {
+                /** @var  $model \c006\user\models\User */
+                $model = self::loadModel($model['id']);
+                $model->security = '';
+                $model->status = 10;
+                $model->updated_at = CoreHelper::mysqlTimestamp();
+                $model->save();
+                Yii::$app->getUser()->login($model);
+
+                $content = $this->renderPartial('user-login-message');
+                Alerts::setMessage($content);
+                Alerts::setAlertType(Alerts::ALERT_SUCCESS);
+                Alerts::setCountdown(5);
+
+                if (Yii::$app->session->get('C006_LOGIN_PATH')) {
+                    $path = Yii::$app->session->get('C006_LOGIN_PATH');
+
+                    return $this->redirect(AppHelpers::formatUrl([$path]));
+                }
+
+                return $this->redirect('/');
+            }
+        }
+
+        Alerts::setMessage('Your token did not match our records, please contact support');
+        Alerts::setAlertType(Alerts::ALERT_WARNING);
+
+        die("NO");
+
+        return $this->redirect('/');
     }
 
     /**
@@ -160,28 +197,34 @@ class IndexController extends Controller
     {
         $model = new Signup();
         if ($model->load(Yii::$app->request->post())) {
+
             if ($user = $model->signup()) {
 
-                Alerts::setMessage('Welcome ' . $user->first_name);
+//                print_r($user); exit;
+
+                Alerts::setMessage('Thank you ' . $user->first_name . ', for signing up.<br>Please check your email to complete the process.');
                 Alerts::setAlertType(Alerts::ALERT_SUCCESS);
-                if (Yii::$app->getUser()->login($user)) {
+                //if (Yii::$app->getUser()->login($user)) {
 
-                    /* ~ c006\email\EmailTemplates */
-                    $array = [];
-                    $array['page_title'] = ' :: Sign Up';
-                    $array['name'] = $user->first_name;
-                    $array['subject'] = 'c006 Development ' . $array['page_title'];
-                    $array['message'] = \c006\email\assets\Assets::$MSG_SIGN_UP;
-                    $array['message'] = str_replace('#NAME#', $array['name'], $array['message']);
-                    $array['email_to'] = $user->email;
-                    $array['email_from'] = Yii::$app->params['supportEmail'];
-                    $array['email_from_name'] = Yii::$app->params['siteName'];
+                /* ~ c006\email\EmailTemplates */
+                $array = [];
+                $array['page_title'] = ' :: Sign Up';
+                $array['name'] = $user->first_name;
+                $array['subject'] = Yii::$app->params['siteName'] . $array['page_title'];
+                $array['message'] = \c006\email\assets\Assets::$MSG_SIGN_UP_VERIFY;
+                $array['message'] = str_replace('#NAME#', $array['name'], $array['message']);
+                $array['message'] = str_replace('#VERIFY_URL#', Yii::$app->params['siteUrl'] . '/user/email?token=' . substr($user->security, 0, 11) . '.' . md5($user->pin), $array['message']);
+                $array['email_to'] = $user->email;
+                $array['email_from'] = Yii::$app->params['supportEmail'];
+                $array['email_from_name'] = Yii::$app->params['siteName'];
 
-                    EmailTemplates::widget(['template'=>'sign-up', 'array'=> $array]);
-                    /* End */
+                EmailTemplates::widget(['template' => 'sign-up', 'array' => $array]);
 
-                    return $this->redirect(AppHelpers::formatUrl(['user/login']));
-                }
+                /* End */
+                die("done");
+
+                return $this->redirect(AppHelpers::formatUrl(['user/login']));
+                //}
             }
         }
 
@@ -273,6 +316,12 @@ class IndexController extends Controller
         return $this->render('resetPassword', [
             'model' => $model,
         ]);
+    }
+
+
+    private function loadModel($id)
+    {
+        return User::findOne($id);
     }
 
 }

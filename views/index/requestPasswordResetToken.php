@@ -6,7 +6,7 @@ use yii\helpers\Html;
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $model c006\user\models\form\PasswordResetRequest */
 
-$this->title                   = 'Request password reset';
+$this->title = 'Request password reset';
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'account'), 'url' => ['/account']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
