@@ -20,9 +20,6 @@
     }
   },
   "require": {
-    "c006/yii2-core": "*",
-    "c006/yii2-email-templates": "*",
-    "c006/yii2-alerts": "*"
   },
   "extra": {
     "asset-installer-paths": {
